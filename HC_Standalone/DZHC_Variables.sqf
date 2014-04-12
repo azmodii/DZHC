@@ -4,7 +4,7 @@
 	License Link:	https://www.bistudio.com/english/community/licenses/dayz-mod-license-share-alike
 	Source Link: https://github.com/azmodii/DZHC
 */
-DZHC_HC_Connected = false;
-DZHC_Handle_Scripts = [
-	["DQS\Modules\AI\HC\DQS_AI_HC_Init.sqf","DQS\AI\DQS_AI_Init.sqf"]
-];
+DZHC_Server_Automation = true;
+DZHC_HC_Active = false;
+
+DZHC_Local_Tasks = [];

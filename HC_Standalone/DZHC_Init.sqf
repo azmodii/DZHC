@@ -6,8 +6,4 @@
 */
 
 waitUntil {!isNull player};
-spawn DZHC_Local_Heartbeat;
-waitUntil {!DZHC_HCActive};
-DZHC_Server_HCMessage = format["HC ID %1 | Idle!",(owner player)]; 
-waitUntil {DZHC_HCActive};
-DZHC_Server_HCMessage = format["HC ID %1 | Online!",(owner player)]; 
+spawn DZHC_HC_Heartbeat;

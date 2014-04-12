@@ -5,17 +5,27 @@
 	Source Link: https://github.com/azmodii/DZHC
 */
 
+DZHC_Variable_Diagnostics_Network = true;
+DZHC_Variable_NetworkTimeout = 10;			/* as Integer;	Default 10;		Timeout period for network congestion */
+
 /*
 [
-	HC;			| as Code;		Code to run for override
-	Override;	| as Code;		Original code to override
-	type; 		| as Integer; 	1 = call, 2 = spawn, 3 = execVM, 4 = compile, 5 = call compile, 6 = spawn compile, 7 = call compile preprocessfile, 8 = call compile preprocessfilelinenumbers 
-	hasArgs;	| as Boolean; 	If true it will pass arguments
-	Args;		| as Array;		Arguments to pass BOTH HC and Override
-	isServer	| as Boolean;	If false, it must be a client override
-	Priority	| as Integer;	10 = Greatest, 1 = Lowest, 0 = Async
+	-HC-
+	0 - Type; 		| as Integer; 	1 = call, 2 = spawn, 3 = execVM, 4 = compile, 5 = call compile, 6 = spawn compile, 7 = call compile preprocessfile, 8 = call compile preprocessfilelinenumbers 
+	1 - Compile;	| as Code;		Code to run for override
+	2 - Args;		| as Array;		Arguments to pass BOTH HC and Override
+	
+	-Locality-
+	3 - Override;	| as Code;		Original code to override
+	4 - Terminate;	| as Array;		List of threads to terminate if running locally
+	
+	-Options-
+	5 - Suspend;	| as Boolean;	Can this process be suspended
+	6 - isServer	| as Boolean;	If false, it must be a client override
+	7 - Priority	| as Integer;	10 = Greatest, 1 = Lowest
+	8 - Async		| as Boolean;	Run this command asynchronously
 ]
 */
 DZHC_Server_Overrides = [
-	["HC\DQS\AI\AI_Init.sqf","DQS\Modules\AI\AI_Init.sqf",3,false,[],true,10]
+	[3,"HC\DQS\AI\AI_Init.sqf",[],"DQS\Modules\AI\AI_Init.sqf",[],true,10,true]
 ];
