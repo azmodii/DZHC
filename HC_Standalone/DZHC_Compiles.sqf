@@ -18,9 +18,15 @@ if (!isDedicated && !hasInterface) then {
 		};
 	};
 	
+	DZHC_HC_Activate = {
+		DZHC_HCActive = true;
+	};
 	
-	
+	DZHC_Local_DeactivateHC = {
+		DZHCActive = false;
+	};
 	// HC EH
-	
+	"DZHC_Local_ActivateHC" addPublicVariableEventHandler DZHC_HC_Activate;
+	"DZHC_Local_DeactivateHC" addPublicVariableEventHandler DZHC_HC_Deactivate;
 };
 

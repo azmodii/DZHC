@@ -6,5 +6,8 @@
 */
 
 waitUntil {!isNull player};
-// Connect to the server
 spawn DZHC_Local_Heartbeat;
+waitUntil {!DZHC_HCActive};
+DZHC_Server_HCMessage = format["HC ID %1 | Idle!",(owner player)]; 
+waitUntil {DZHC_HCActive};
+DZHC_Server_HCMessage = format["HC ID %1 | Online!",(owner player)]; 
