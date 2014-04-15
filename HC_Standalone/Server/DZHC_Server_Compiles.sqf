@@ -1,11 +1,12 @@
 /* Headless Client Framework for Arma 2 OA 
-	By: [GSG] Az
-	Licence: This software is licensed under the Dayz Share Alike Licence
+	By: 			[GSG] Az
+	Licence: 		This software is licensed under the Dayz Share Alike Licence
 	License Link:	https://www.bistudio.com/english/community/licenses/dayz-mod-license-share-alike
-	Source Link: https://github.com/azmodii/DZHC
+	Source Link:	https://github.com/azmodii/DZHC
 */
 
 waituntil {!isNil "bis_fnc_init"};
+call compile preprocessFileLineNumbers "\z\addons\dayz_server\DZHC\DZHC_Server_Config.sqf";
 if (isNil "DZHC_Server_Monitor_HB") then {DZHC_Server_Monitor_HB = false;};
 if (isNil "DZHC_Server_Connected") then {DZHC_Server_Connected = [];};
 if (isNil "DZHC_Server_Queue") then {DZHC_Server_Queue = [];};
@@ -63,11 +64,51 @@ DZHC_Network_Timeout = {
 	};
 };
 
+DZHC_Publish_Override = {
+	// ADD CODE FOR OVERRIDE
+	// [hcid,Args,Override,Terminate,Suspend,isServer,priority];
+	_vars = _this;
+	_hcid = _vars select 0;
+	_override = _vars select 2;
+	_terminate = _vars select 3;
+	_suspend = _vars select 4;
+	_priority = _vars select 6;
+	_isServer = _vars select 5;
+	
+	if (_isServer) then {
+		_code = format["{%1 = {};};",_override];
+		call compile _code;
+		{
+			_count = (DZHC_Server_Overridable select 0) find _x;
+			_handle = (DZHC_Server_Overridable select 1) select _count;
+			terminate _handle;
+		} forEach _terminate;
+		DZHC_Server_HCHandoffs_Active = + [_hcid,_override,_suspend];
+	} else {
+		DZHC_Client_Overide = [_override,_terminate,_suspend];
+		{
+			_owner = owner _x;
+			_name = name _x;
+			if (_name != "HeadlessClient") then {
+				_owner publicVariableClient "DZHC_Client_Override";
+			};
+		} forEach playableUnits;
+	};	
+
+};
+
+DZHC_Publish_Failed = {
+	// _send = [type,Compile,Args,priority];
+	// _monitor = [hcid,Args,Override,Terminate,Suspend,isServer,priority];
+			
+};
+
 DZHC_Publish_Task = {
 	_client = _this select 0;
 	_vars = _this select 1;
 	_task = _vars select 0;
 	_monitor = _vars select 1;
+	_succeed = false;
 	DZHC_Local_AssignTask = _task;
 	_client publicVariableClient "DZHC_Local_AssignTask";
 	_diag = [] spawn DZHC_Network_Timeout;
@@ -75,7 +116,15 @@ DZHC_Publish_Task = {
 	terminate _diag;
 	if (DZHC_Client_Failed) exitWith {[_hcid,"Client Failed to Respond"] call DZHC_Server_Diagnostics; DZHC_Client_Failed;};
 	if (!DZHC_Monitor_Task_Active) then {[] spawn DZHC_Monitor_Task;};
-	DZHC_Monitored_Tasks = + DZHC_Monitored_Tasks + [_monitor];
+	_override = [_monitor] call DZHC_Publish_Override;
+	if (_override) then {
+		_succeed = true;
+		DZHC_Monitored_Tasks = + DZHC_Monitored_Tasks + [_monitor];
+	} else {
+		_succeed = false;
+		[_task,_monitor] call DZHC_Publish_Failed;
+	};
+	_succeed;
 };
 
 DZHC_Process_Queue = {
@@ -108,7 +157,7 @@ DZHC_Process_Queue = {
 
 DZHC_Server_Start = {
 	//Get a list of tasks
-	if ((count DZHC_Server_Overrides) > 0) then {
+	if ((count DZHC_Server_HCHandoffs) > 0) then {
 		{	
 			private ["_send","_monitor","_async"];
 			// [type,Compile,Args,priority];
@@ -117,18 +166,28 @@ DZHC_Server_Start = {
 			_monitor = [0,_x select 2,_x select 3,_x select 4,_x select 5,_x select 6,_x select 7];
 			_async = _x select 8;
 			DZHC_Server_Queue = DZHC_Server_Queue + [_send,_monitor,_async];
-		} forEach DZHC_Server_Overrides;
+		} forEach DZHC_Server_HCHandoffs;
 	};
 	call DZHC_Process_Queue;
 };
 
+DZHC_Server_Kill = {
+
+};
+
 DZHC_Server_Diagnostics = {
-
+	call DZHC_Server_Kill;
 };
 
-DZHC_Server_PreInit = {
-	DZHC_Monitored_Threads = [["server",[]],["override",[]],["critical",[]]];
-};
+DZHC_AddOverride = {
+		waitUntil {!DZHC_inProgress_Override};
+		_temp1 = DZHC_Server_Overrides select 0;
+		_temp2 = DZHC_Server_Overrides select 1;
+		_handle = _this select 0;
+		_override = _this select 1;
+		DZHC_Server_Overrides = [(_temp1 + [_override]),[(_temp2 + [_handle])]];
+		true;
+	};
 
 // Server loops
 DZHC_Monitor_HB = {
@@ -171,7 +230,7 @@ DZHC_Monitor_Task = {
 	DZHC_Monitor_Task_Active = true;
 };
 
-call DZHC_Server_PreInit;
+
 
 // Finally, initialise the HC framework
 if (DZHC_Server_Automation) then {
