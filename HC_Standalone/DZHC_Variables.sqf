@@ -5,10 +5,24 @@
 	Source Link:	https://github.com/azmodii/DZHC
 */
 
+DZHC_Client_hasTask = false;
+DZHC_Client_Override = false;
+DZHC_Client_Responded = false;
+DZHC_Local_Query = false;
+DZHC_Local_AssignTask = false;
+DZHC_Server_Heartbeat = false;
 DZHC_inProgress_Override = false;
 
 if (isServer) then {
-	DZHC_Server_Automation = true;
+	DZHC_Client_Failed = false;
+	DZHC_Server_Connected = [];
+	DZHC_Server_HCHandoffs_Active = [];
+	DZHC_Server_Queue = [];
+	DZHC_Server_Monitor_HB = false;
+	DZHC_Monitored_Tasks = [];
+	DZHC_Monitor_Task_Active = false;
+	DZHC_Monitored_Threads = [];
+	DZHC_Server_Overrides = [[],[]];
 };
 
 if (!isDedicated && hasInterface) then {
@@ -19,4 +33,5 @@ if (!isDedicated && hasInterface) then {
 if (!isDedicated && !hasInterface) then {
 	DZHC_HC_Active = false;
 	DZHC_Local_Tasks = [];
+	DZHC_HC_Overrides = [];
 };

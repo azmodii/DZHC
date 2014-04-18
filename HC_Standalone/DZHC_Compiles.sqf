@@ -20,28 +20,20 @@ if (!isDedicated && !hasInterface) then {
 	
 	DZHC_AddOverride = {
 		waitUntil {!DZHC_inProgress_Override};
-		_temp1 = DZHC_Client_Overrides select 0;
-		_temp2 = DZHC_Client_Overrides select 1;
+		_temp1 = DZHC_HC_Overrides select 0;
+		_temp2 = DZHC_HC_Overrides select 1;
 		_handle = _this select 0;
 		_override = _this select 1;
-		DZHC_Client_Overrides = [(_temp1 + [_override]),[(_temp2 + [_handle])]];
+		DZHC_HC_Overrides = [(_temp1 + [_override]),[(_temp2 + [_handle])]];
 		true;
 	};
 	
-	// HC EH
-	DZHC_HC_EH_Activate = {
-		DZHC_HC_Active = true;
+	DZHC_HC_TaskMonitor = {
+		//[_priority,_handle,_type]
+		
 	};
 	
-	DZHC_HC_EH_Deactivate = {
-		// Begin idling the HC
-		{
-			terminate _x select 1;
-		} forEach DZHC_Local_Tasks;
-		DZHC_HC_Active = [owner player,false];
-		
-		
-	};
+	// HC EH
 	DZHC_HC_EH_Process_Query = {
 		_query = _this select 1;
 		if (_query == 0) then {if((count DZHC_Local_Tasks) < 1) then {DZHC_Client_hasTask = false;} else {DZHC_Client_hasTask = true;}; publicVariableServer "DZHC_Client_hasTask"; DZHC_Client_Responded = true; publicVariableServer "DZHC_Client_Responded";};
@@ -70,8 +62,6 @@ if (!isDedicated && !hasInterface) then {
 	};
 	
 	// HC EH
-	"DZHC_Local_ActivateHC" addPublicVariableEventHandler DZHC_HC_EH_Activate;
-	"DZHC_Local_DeactivateHC" addPublicVariableEventHandler DZHC_HC_EH_Deactivate;
 	"DZHC_Local_Query" addPublicVariableEventHandler DZHC_HC_EH_Process_Query;
 	"DZHC_Local_AssignTask" addPublicVariableEventHandler DZHC_HC_EH_AssignTask;
 };
@@ -107,7 +97,7 @@ if (!isDedicated && hasInterface) then {
 	};
 	
 	// Client EH
-	"DZHC_Client_Overide" addPublicVariableEventHandler DZHC_Client_EH_Override;
+	"DZHC_Client_Override" addPublicVariableEventHandler DZHC_Client_EH_Override;
 
 };
 

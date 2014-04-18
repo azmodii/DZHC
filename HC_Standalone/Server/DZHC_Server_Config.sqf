@@ -14,8 +14,8 @@
 				then
 	[_handle,"Variable/Override Name"] call DZHC_AddOverride;			
 */
-DZHC_Server_Overrides = [[],[]];
-DZHC_Monitored_Threads = [["server",[]],["override",[]],["critical",[]]];
+
+DZHC_Server_Automation = true;
 DZHC_Variable_Diagnostics_Network = true;
 DZHC_Variable_NetworkTimeout = 10;			/* as Integer;	Default 10;		Timeout period for network congestion */
 

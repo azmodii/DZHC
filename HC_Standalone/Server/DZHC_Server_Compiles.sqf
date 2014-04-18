@@ -7,15 +7,6 @@
 
 waituntil {!isNil "bis_fnc_init"};
 call compile preprocessFileLineNumbers "\z\addons\dayz_server\DZHC\DZHC_Server_Config.sqf";
-if (isNil "DZHC_Server_Monitor_HB") then {DZHC_Server_Monitor_HB = false;};
-if (isNil "DZHC_Server_Connected") then {DZHC_Server_Connected = [];};
-if (isNil "DZHC_Server_Queue") then {DZHC_Server_Queue = [];};
-if (isNil "DZHC_Client_Responded") then {DZHC_Client_Responded = false;};
-if (isNil "DZHC_Client_hasTask") then {DZHC_Client_hasTask = true;};
-if (isNil "DZHC_Client_Failed") then {DZHC_Client_Failed = false;};
-if (isNil "DZHC_Monitor_Task_Active") then {DZHC_Monitor_Task_Active = false;};
-if (isNil "DZHC_Monitored_Tasks") then {DZHC_Monitored_Tasks = [];};
-if (isNil "DZHC_Monitored_Threads") then {DZHC_Monitored_Threads = [];};
 
 // Server Event Handlers
 DZHC_Handler_Heartbeat = {
@@ -79,13 +70,13 @@ DZHC_Publish_Override = {
 		_code = format["{%1 = {};};",_override];
 		call compile _code;
 		{
-			_count = (DZHC_Server_Overridable select 0) find _x;
-			_handle = (DZHC_Server_Overridable select 1) select _count;
+			_count = (DZHC_Server_Overrides select 0) find _x;
+			_handle = (DZHC_Server_Overrides select 1) select _count;
 			terminate _handle;
 		} forEach _terminate;
 		DZHC_Server_HCHandoffs_Active = + [_hcid,_override,_suspend];
 	} else {
-		DZHC_Client_Overide = [_override,_terminate,_suspend];
+		DZHC_Client_Override = [_override,_terminate,_suspend];
 		{
 			_owner = owner _x;
 			_name = name _x;
@@ -94,7 +85,6 @@ DZHC_Publish_Override = {
 			};
 		} forEach playableUnits;
 	};	
-
 };
 
 DZHC_Publish_Failed = {
@@ -114,7 +104,7 @@ DZHC_Publish_Task = {
 	_diag = [] spawn DZHC_Network_Timeout;
 	waitUntil {DZHC_Client_Responded};
 	terminate _diag;
-	if (DZHC_Client_Failed) exitWith {[_hcid,"Client Failed to Respond"] call DZHC_Server_Diagnostics; DZHC_Client_Failed;};
+	if (DZHC_Client_Failed) exitWith {[_hcid,"Client Failed to Respond"] call DZHC_Server_Diagnostics; DZHC_Client_Failed = false;};
 	if (!DZHC_Monitor_Task_Active) then {[] spawn DZHC_Monitor_Task;};
 	_override = [_monitor] call DZHC_Publish_Override;
 	if (_override) then {
@@ -222,12 +212,13 @@ DZHC_Monitor_waitForHC = {
 };
 
 DZHC_Monitor_Task = {
+	DZHC_Monitor_Task_Active = true;
 	while {true} do
 	{
 		//Monitor Task Loop
 	
 	};
-	DZHC_Monitor_Task_Active = true;
+	
 };
 
 

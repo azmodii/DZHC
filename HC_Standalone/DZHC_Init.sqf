@@ -5,5 +5,17 @@
 	Source Link:	https://github.com/azmodii/DZHC
 */
 
+/* This script should be executed in your init.sqf as follows;
+
+	if (!isDedicated && !hasInterface) then {
+		execVM "DZHC\DZHC_Init.sqf";
+	};
+	
+*/
+
 waitUntil {!isNull player};
 spawn DZHC_HC_Heartbeat;
+waitUntil {DZHC_HC_KillSignal};
+terminate DZHC_HC_Heartbeat;
+DZHC_KICK = true;
+publicVariableServer "DZHC_KICK";
