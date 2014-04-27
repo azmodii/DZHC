@@ -12,7 +12,7 @@
 	
 	to the script/variable executed: 	_handle = execVM etc..
 				then
-	[_handle,"Variable/Override Name"] call DZHC_AddOverride;			
+	[_handle,"Variable/Override Name"] call DZHC_Server_AddOverride;			
 */
 
 DZHC_Server_Automation = true;

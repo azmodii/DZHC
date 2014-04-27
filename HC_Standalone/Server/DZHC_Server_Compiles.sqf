@@ -46,6 +46,7 @@ DZHC_Handler_Request = {
 
 // Server Functions
 DZHC_Network_Timeout = {
+	private ["_count"];
 	_count = 0;
 	while {!DZHC_Client_Responded} do
 	{
@@ -56,6 +57,7 @@ DZHC_Network_Timeout = {
 };
 
 DZHC_Publish_Override = {
+	private ["_vars","_hcid","_override","_terminate","_suspend","_priority","_isServer","_code","_count","_handle","_owner","_name"];
 	// ADD CODE FOR OVERRIDE
 	// [hcid,Args,Override,Terminate,Suspend,isServer,priority];
 	_vars = _this;
@@ -94,6 +96,7 @@ DZHC_Publish_Failed = {
 };
 
 DZHC_Publish_Task = {
+	private ["_client","_vars","_task","_monitor","_succeed","_diag","_override"];
 	_client = _this select 0;
 	_vars = _this select 1;
 	_task = _vars select 0;
@@ -104,7 +107,7 @@ DZHC_Publish_Task = {
 	_diag = [] spawn DZHC_Network_Timeout;
 	waitUntil {DZHC_Client_Responded};
 	terminate _diag;
-	if (DZHC_Client_Failed) exitWith {[_hcid,"Client Failed to Respond"] call DZHC_Server_Diagnostics; DZHC_Client_Failed = false;};
+	if (DZHC_Client_Failed) exitWith {[_client,"Client Failed to Respond"] call DZHC_Server_Diagnostics; DZHC_Client_Failed = false;};
 	if (!DZHC_Monitor_Task_Active) then {[] spawn DZHC_Monitor_Task;};
 	_override = [_monitor] call DZHC_Publish_Override;
 	if (_override) then {
@@ -118,6 +121,7 @@ DZHC_Publish_Task = {
 };
 
 DZHC_Process_Queue = {
+	private ["_connected","_continue","_count","_hcid","_time","_owner","_diag","_task"];
 	// Lets find a free HC
 	_connected = + DZHC_Server_Connected;
 	_continue = true;
@@ -162,22 +166,23 @@ DZHC_Server_Start = {
 };
 
 DZHC_Server_Kill = {
-
+	diag_log "DZHC: ServerKill Called";
 };
 
 DZHC_Server_Diagnostics = {
 	call DZHC_Server_Kill;
 };
 
-DZHC_AddOverride = {
-		waitUntil {!DZHC_inProgress_Override};
-		_temp1 = DZHC_Server_Overrides select 0;
-		_temp2 = DZHC_Server_Overrides select 1;
-		_handle = _this select 0;
-		_override = _this select 1;
-		DZHC_Server_Overrides = [(_temp1 + [_override]),[(_temp2 + [_handle])]];
-		true;
-	};
+DZHC_Server_AddOverride = {
+	private ["_temp1","_temp2","_handle","_override"];
+	waitUntil {!DZHC_inProgress_Override};
+	_temp1 = DZHC_Server_Overrides select 0;
+	_temp2 = DZHC_Server_Overrides select 1;
+	_handle = _this select 0;
+	_override = _this select 1;
+	DZHC_Server_Overrides = [(_temp1 + [_override]),[(_temp2 + [_handle])]];
+	true;
+};
 
 // Server loops
 DZHC_Monitor_HB = {

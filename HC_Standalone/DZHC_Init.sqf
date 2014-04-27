@@ -14,8 +14,11 @@
 */
 
 waitUntil {!isNull player};
-spawn DZHC_HC_Heartbeat;
-waitUntil {DZHC_HC_KillSignal};
-terminate DZHC_HC_Heartbeat;
-DZHC_KICK = true;
-publicVariableServer "DZHC_KICK";
+[] spawn {
+	while {true} do
+	{
+		DZHC_Server_Heartbeat = player;
+		publicVariableServer "DZHC_Server_Heartbeat";
+		sleep 3;
+	};
+};

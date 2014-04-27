@@ -18,7 +18,8 @@ if (!isDedicated && !hasInterface) then {
 		};
 	};
 	
-	DZHC_AddOverride = {
+	DZHC_HC_AddOverride = {
+		private ["_temp1","_temp2","_handle","_override"];
 		waitUntil {!DZHC_inProgress_Override};
 		_temp1 = DZHC_HC_Overrides select 0;
 		_temp2 = DZHC_HC_Overrides select 1;
@@ -35,11 +36,13 @@ if (!isDedicated && !hasInterface) then {
 	
 	// HC EH
 	DZHC_HC_EH_Process_Query = {
+		private ["_query"];
 		_query = _this select 1;
 		if (_query == 0) then {if((count DZHC_Local_Tasks) < 1) then {DZHC_Client_hasTask = false;} else {DZHC_Client_hasTask = true;}; publicVariableServer "DZHC_Client_hasTask"; DZHC_Client_Responded = true; publicVariableServer "DZHC_Client_Responded";};
 	};
 	
 	DZHC_HC_EH_AssignTask = {
+		private ["_task","_type","_compile","_args","_priority"];
 		_task = _this select 1;
 		_type = _task select 0;
 		_compile = _task select 1;
@@ -69,7 +72,8 @@ if (!isDedicated && !hasInterface) then {
 // Client Functions
 if (!isDedicated && hasInterface) then {
 	
-	DZHC_AddOverride = {
+	DZHC_Client_AddOverride = {
+		private ["_temp1","_temp2","_handle","_override"];
 		waitUntil {!DZHC_inProgress_Override};
 		_temp1 = DZHC_Client_Overrides select 0;
 		_temp2 = DZHC_Client_Overrides select 1;
@@ -80,6 +84,7 @@ if (!isDedicated && hasInterface) then {
 	};
 	
 	DZHC_Client_EH_Override = {
+		private ["_vars","_override","_terminate","_code"];
 		_vars = _this select 1;
 		_override = _vars select 0;
 		if (_override in DZHC_Client_Overrides_Active) exitWith {
@@ -89,6 +94,7 @@ if (!isDedicated && hasInterface) then {
 		_code = format["{if(!isNil ""%1"") then { %1 = {};};};",_override];
 		call compile _code;
 		{
+			private ["_count","_handle"];
 			_count = (DZHC_Client_Overrides select 0) find _x;
 			_handle = (DZHC_Client_Overrides select 1) select _count;
 			terminate _handle;
